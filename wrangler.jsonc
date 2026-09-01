@@ -42,3 +42,10 @@
 	 */
 	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ]
 }
+  "rate_limiting": [
+    {
+      "binding": "VOICE_LIMITER",
+      "id": "eleven_labs_voice_limit",
+      "limit": 5,
+      "period": 60
+    }
