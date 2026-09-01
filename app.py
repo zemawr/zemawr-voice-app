@@ -16,10 +16,16 @@ class AdScriptRequest(BaseModel):
     speaker: str = "Anais Takahara" # A high-quality built-in professional voice option
 
 @app.post("/v1/generate-ad-speech")
+#app.post("/generate-ad-speech")
 async def generate_speech(request_data: AdScriptRequest, request: Request):
-    # 1. Read the edge rate limit header sent from your wrangler setup
+    # 1. Read the secret security token from the request headers
+    auth_token = request.headers.get("x-voice-auth-token")
+     2. Block anyone who doesn't have the secret key immediately
+    if auth_token != "INTERNAL_VOICE_SECRET_2026":
+        raise HTTPException(status_code=403, detail="Unauthorized traffic block.")
+    
+    # 3. Read the edge rate limit header sent from your wrangler setup
     if request.headers.get("cf-connecting-ip"):
-        # This acts as your shield if a bot tries to spam requests
         pass
         
     if not request_data.text:
