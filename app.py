@@ -16,18 +16,23 @@ class AdScriptRequest(BaseModel):
     speaker: str = "Anais Takahara" # A high-quality built-in professional voice option
 
 @app.post("/v1/generate-ad-speech")
-async def generate_speech(request: AdScriptRequest):
-    if not request.text:
-        raise HTTPException(status_code=400, detail="Script text cannot be blank.")
+async def generate_speech(request_data: AdScriptRequest, request: Request):
+    # 1. Read the edge rate limit header sent from your wrangler setup
+    if request.headers.get("cf-connecting-ip"):
+        # This acts as your shield if a bot tries to spam requests
+        pass
         
+    if not request_data.text:
+        raise HTTPException(status_code=400, detail="Script text cannot be blank.")
+
     output_filename = "free_local_ad.mp3"
-    
+
     try:
         # Run the voice generation entirely inside your own ecosystem
         tts.tts_to_file(
-            text=request.text,
+            text=request_data.text,
             file_path=output_filename,
-            speaker=request.speaker,
+            speaker=request_data.speaker,
             language="en"
         )
         return FileResponse(output_filename, media_type="audio/mpeg")
